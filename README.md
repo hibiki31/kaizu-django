@@ -1,1 +1,1 @@
-# kaizu-django
+# kaizu-django-vue
