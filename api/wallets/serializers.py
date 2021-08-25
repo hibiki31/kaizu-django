@@ -7,6 +7,7 @@ class WalletSerializer(serializers.ModelSerializer):
     class Meta:
         model = Wallet
         fields = (
+            'pk',
             'name', 
             'color',
             'amount',

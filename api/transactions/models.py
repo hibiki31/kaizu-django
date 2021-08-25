@@ -10,4 +10,6 @@ class Transaction(models.Model):
     wallet_income = models.ForeignKey(Wallet, related_name='wallet_income', on_delete=models.CASCADE)
 
     def __str__(self):
-        return f'{str(self.date)} {self.shop}'
+        return f'{self.pk}: {str(self.date)} {self.shop}'
+    
+    __repr__ = __str__

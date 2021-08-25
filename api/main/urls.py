@@ -19,10 +19,12 @@ from django.conf.urls import url
 from rest_framework import routers
 
 from wallets.views import WalletViewSet
+from transactions.views import TransactionViewSet
 
 
 router = routers.DefaultRouter()
 router.register(r'wallets', WalletViewSet)
+router.register(r'transactions', TransactionViewSet)
 
 
 urlpatterns = [
