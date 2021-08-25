@@ -2,11 +2,11 @@
 // https://github.com/microsoft/vscode-dev-containers/tree/v0.191.1/containers/python-3-postgres
 // Update the VARIANT arg in docker-compose.yml to pick a Python version: 3, 3.8, 3.7, 3.6 
 {
-	"name": "API",
+	"name": "KAIZU-API",
 	"dockerComposeFile": "docker-compose.yml",
 	"service": "app",
 	"workspaceFolder": "/workspace/api/",
-
+	"postCreateCommand": "echo alias m=\\'python manage.py\\' >> /etc/bash.bashrc",
 	// Set *default* container specific settings.json values on container create.
 	"settings": { 
 		"sqltools.connections": [{
