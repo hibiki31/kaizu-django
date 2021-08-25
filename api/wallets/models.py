@@ -1,3 +1,14 @@
 from django.db import models
 
-# Create your models here.
+
+class Wallet(models.Model):
+    name = models.CharField(max_length=128)
+    color = models.CharField(max_length=8, default='#9E9E9E')
+    amount = models.IntegerField(default=0)
+    code = models.CharField(max_length=16)
+    kind = models.CharField(max_length=32)
+    is_favorite = models.BooleanField(default=False)
+    is_hide = models.BooleanField(default=False)
+    
+    def __str__(self):
+        return self.name

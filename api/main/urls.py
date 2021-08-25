@@ -15,8 +15,19 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
+from django.conf.urls import url
+from rest_framework import routers
+
+from wallets.views import WalletViewSet
+
+
+router = routers.DefaultRouter()
+router.register(r'wallets', WalletViewSet)
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('wallets/', include('wallets.urls')),
+    path('auth/', include('rest_framework.urls')),
+    url('api/rest/', include(router.urls)),
 ]

@@ -39,6 +39,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # Plugin
     'rest_framework',
+    # App
+    'wallets.apps.WalletsConfig',
+    'transactions.apps.TransactionsConfig',
 ]
 
 MIDDLEWARE = [
@@ -111,7 +114,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Tokyo'
 
 USE_I18N = True
 
