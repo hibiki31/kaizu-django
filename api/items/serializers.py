@@ -27,8 +27,20 @@ class CategorySerializer(serializers.ModelSerializer):
             'sub_category'
         )
 
+class ItemSubCategorySerializer(serializers.ModelSerializer):
+    category = CategorySerializer(read_only=True)
+
+    class Meta:
+        model = SubCategory
+        fields = (
+            'pk',
+            'name', 
+            'code',
+            'category',
+        )
+
 class ItemSerializer(serializers.ModelSerializer):
-    sub_category = SubCategorySerializer(read_only=True)
+    sub_category = ItemSubCategorySerializer(read_only=True)
     sub_category_id = serializers.PrimaryKeyRelatedField(queryset=SubCategory.objects.all(), write_only=True)
 
     class Meta:

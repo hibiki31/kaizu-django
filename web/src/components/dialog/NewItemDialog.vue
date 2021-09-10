@@ -21,17 +21,17 @@
                   label="日付"
                   type="date"
                   placeholder=" "
-                  v-model="item.date"
+                  v-model="transaction.date"
                   :rules="[required]"
                 ></v-text-field>
               </v-col>
               <v-col cols="12" sm="12" md="2" v-if="tabId != 1">
                 <v-select
                   :items="walletList"
-                  v-model="item.walletExpensesId"
+                  v-model="transaction.wallet_expenses_id"
                   label="出金口座"
                   item-text="code"
-                  item-value="id"
+                  item-value="pk"
                   placeholder=" "
                   :rules="[required]"
                 >
@@ -46,10 +46,10 @@
               <v-col cols="12" sm="12" md="2" v-if="tabId != 0">
                 <v-select
                   :items="walletList"
-                  v-model="item.walletIncomeId"
+                  v-model="transaction.wallet_income_id"
                   label="入金口座"
                   item-text="code"
-                  item-value="id"
+                  item-value="pk"
                   item-color="color"
                   placeholder=" "
                   :rules="[required]"
@@ -63,45 +63,24 @@
                 </v-select>
               </v-col>
                <v-col cols="12" sm="10" md="5">
-              <v-autocomplete
-                v-model="item.shop"
-                v-bind:options="options"
-                :items="shopList"
-                :loading="isLoading"
-                :search-input.sync="search"
-                item-text="shop"
-                item-value="shop"
-                label="店名"
-                placeholder=" "
-                return-object
-                no-filter
-                :rules="[required]"
-              >
-                <template v-slot:item="{ item }">
-                  <v-row>
-                    <v-col cols="12" sm="9">
-                      <span>{{ item.shop }}</span>
-                    </v-col>
-                    <v-col cols="12" sm="3">
-                      <span>{{ item.count }} 回</span>
-                    </v-col>
-                  </v-row>
-
-                </template>
-              </v-autocomplete>
+                 <v-combobox
+                 v-model="transaction.supplier_id"
+                  :items="shopList"
+                  label="取引先"
+                  item-text="name"
+                ></v-combobox>
               </v-col>
             </v-row>
             <!-- アイテム行 -->
-            <v-row v-for="(row,index) in item.items" :key="index">
+            <v-row v-for="(row,index) in transaction.items" :key="index">
               <v-col cols="12" sm="12" md="2">
                 <v-select
                 :items="bigCategory"
                 item-text="code"
-                item-value="id"
+                item-value="pk"
                 label="カテゴリ"
                 placeholder=" "
-                v-on:change="getSubCategory"
-                v-model="bigCategorySelect"
+                v-model="row.bigCategorySelect"
                 :rules="[required]"
                 >
                   <template v-slot:item="{ item }">
@@ -114,13 +93,13 @@
               </v-col>
               <v-col cols="12" sm="12" md="2">
                 <v-select
-                :items="subCategory"
+                :items="getSubCategory(row.bigCategorySelect)"
                 item-text="name"
-                item-value="id"
+                item-value="pk"
                 label="サブカテゴリ"
                 placeholder=" "
                 no-data-text="サブカテゴリが存在しません"
-                v-model="row.categorySubId"
+                v-model="row.sub_category_id"
                 :rules="[required]"
                 >
                 </v-select>
@@ -180,20 +159,18 @@ export default {
       walletList: [],
       shopList: [],
       // フォームアイテム
-      item: {
-        date: '',
-        shop: '',
-        walletExpensesId: 0,
-        walletIncomeId: 0,
-        provider: '',
-        providerId: 0,
+      transaction: {
+        date: null,
+        supplier_id: null,
+        wallet_income_id: 0,
+        wallet_expenses_id: 0,
+        kind: null,
         items: [
           {
             name: '',
-            kind: '',
-            amount: '',
-            categorySubId: '',
-            transactionId: 0
+            amount_income: 0,
+            amount_expenses: 0,
+            sub_category_id: 0
           }
         ]
       },
@@ -231,7 +208,7 @@ export default {
       if (this.isLoading) return
       this.isLoading = true
       axios
-        .get('/api/transaction/shop', { params: { shopSearch: val } })
+        .get('/api/rest/suppliers', { params: { name: val } })
         .then((response) => {
           this.shopList = response.data
           this.isLoading = false
@@ -264,21 +241,11 @@ export default {
       }
     },
     addItem () {
-      this.item.items.push({
-        date: '',
-        shop: '',
-        walletExpensesId: 0,
-        walletIncomeId: 0,
-        provider: '',
-        providerId: 0,
-        items: [{
-          name: '',
-          kind: '',
-          amount: '',
-          categorySubId: '',
-          categoryBigId: '',
-          transactionId: 0
-        }]
+      this.transaction.items.push({
+        name: '',
+        amount_income: 0,
+        amount_expenses: 0,
+        sub_category_id: 0
       })
     },
     openEditDialog (item) {
@@ -323,31 +290,47 @@ export default {
         }]
       }
     },
-    postValueMapping () {
+    async postValueMapping () {
       this.dialogState = false
-      this.item.shop = this.item.shop.shop
-      this.item.date = moment(this.item.date).format()
-      if (this.tabId === 0) {
-        this.item.walletIncomeId = this.item.walletExpensesId
-      } else if (this.tabId === 1) {
-        this.item.walletExpensesId = this.item.walletIncomeId
+      this.transaction.date = moment(this.transaction.date).format()
+      if (typeof (this.transaction.supplier_id) === 'string' || this.transaction.supplier_id instanceof String) {
+        await axios
+          .post('/api/rest/suppliers/', { name: this.transaction.supplier_id })
+          .then((res) => {
+            this.transaction.supplier_id = res.data.pk
+          })
+      } else {
+        this.transaction.supplier_id = this.transaction.supplier_id.pk
       }
-      for (const row in this.item.items) {
+      // 種別のマッピング
+      if (this.tabId === 0) {
+        this.transaction.kind = 'expenses'
+        this.transaction.wallet_income_id = this.transaction.wallet_expenses_id
+      } else if (this.tabId === 1) {
+        this.transaction.kind = 'income'
+        this.transaction.wallet_expenses_id = this.transaction.wallet_income_id
+      } else if (this.tabId === 2) {
+        this.transaction.kind = 'transfer'
+      }
+      for (const i in this.transaction.items) {
+        // 金額のマッピング
         if (this.tabId === 0) {
-          this.item.items[row].kind = 'expenses'
+          this.transaction.items[i].amount_income = 0
+          this.transaction.items[i].amount_expenses = this.transaction.items[i].amount
         } else if (this.tabId === 1) {
-          this.item.items[row].kind = 'income'
+          this.transaction.items[i].amount_income = this.transaction.items[i].amount
+          this.transaction.items[i].amount_expenses = 0
         } else if (this.tabId === 2) {
-          this.item.items[row].kind = 'transfer'
+          this.transaction.items[i].amount_income = this.transaction.items[i].amount
+          this.transaction.items[i].amount_expenses = this.transaction.items[i].amount
         }
       }
-      this.item.walletIncomeI = this.item.walletExpensesId
-      console.log(this.item)
+      console.log(this.transaction)
     },
-    runPostMethod () {
-      this.postValueMapping()
+    async runPostMethod () {
+      await this.postValueMapping()
       axios
-        .post('/api/transaction/items', this.item)
+        .post('/api/rest/transactions/', this.transaction)
         .then((res) => {
           this.$_pushNotice('成功しました', 'success')
           this.$emit('reload')
@@ -369,24 +352,16 @@ export default {
         })
     },
     getSubCategory (bigId) {
-      axios
-        .get('/api/category/sub', {
-          params: {
-            bigId: bigId
-          }
-        })
-        .then((response) => {
-          if (response.status === 200) {
-            this.subCategory = response.data
-          } else {
-            this.$_pushNotice('サーバーエラーが発生しました', 'error')
-          }
-        })
+      for (const i in this.bigCategory) {
+        if (this.bigCategory[i].pk === bigId) {
+          return this.bigCategory[i].sub_category
+        }
+      }
     }
   },
   mounted: async function () {
     axios
-      .get('/api/wallet')
+      .get('/api/rest/wallets')
       .then((response) => {
         this.walletList = response.data
       })
@@ -394,7 +369,7 @@ export default {
         this.$_pushNotice('サーバーエラーが発生しました', 'error')
       })
     axios
-      .get('/api/category/big')
+      .get('/api/rest/categorys')
       .then((response) => {
         this.bigCategory = response.data
       })
@@ -402,7 +377,7 @@ export default {
         this.$_pushNotice('サーバーエラーが発生しました', 'error')
       })
     axios
-      .get('/api/transaction/shop')
+      .get('/api/rest/suppliers')
       .then((response) => {
         this.shopList = response.data
       })

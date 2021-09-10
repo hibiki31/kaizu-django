@@ -49,14 +49,15 @@ export default {
   methods: {
     openDialog (item) {
       this.item = item
+      console.log(this.item.pk)
       this.dialogState = true
     },
     runMethod () {
+      console.log(this.item.pk)
       this.dialogState = false
       axios.request({
         method: 'delete',
-        url: '/api/transaction',
-        data: { id: this.item.id }
+        url: `/api/rest/transactions/${this.item.pk}/`
       })
         .then(res => {
           this.$emit('reload')

@@ -19,7 +19,7 @@ class SupplierFilter(filters.FilterSet):
 
 
 class TransactionViewSet(viewsets.ModelViewSet):
-    queryset = Transaction.objects.all()
+    queryset = Transaction.objects.order_by('date').reverse().all()
     serializer_class = TransactionSerializer
 
 

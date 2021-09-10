@@ -234,7 +234,7 @@ export default {
       return moment(value).format(format)
     },
     yen (value) {
-      return value.toLocaleString()
+      return value
     }
   },
   methods: {
@@ -254,7 +254,7 @@ export default {
     // カテゴリに連動してサブカテゴリ更新
     getSubCategory (bigId) {
       axios
-        .get('/api/category/sub', {
+        .get('/api/rest/subcategorys/', {
           params: {
             bigId: bigId
           }
@@ -273,10 +273,10 @@ export default {
     getItemList () {
       this.loadingApi = true
       axios
-        .get('/api/item', { params: this.itemQuery })
+        .get('/api/rest/transactions/', { params: this.itemQuery })
         .then((response) => {
-          this.totalItems = response.data.length
-          this.itemsList = response.data.items
+          this.totalItems = response.data.count
+          this.itemsList = response.data.results
           this.loadingApi = false
         })
     }
@@ -287,7 +287,7 @@ export default {
     // routeのGETクエリは読み取り専用なので最初に取得して以後は使わない
     this.itemQuery = this.$route.query
     axios
-      .get('/api/wallet')
+      .get('/api/rest/wallets/')
       .then((response) => {
         this.walletList = response.data
       })
@@ -295,7 +295,7 @@ export default {
         this.$_pushNotice('サーバーエラーが発生しました', 'error')
       })
     axios
-      .get('/api/category/big')
+      .get('/api/rest/categorys/')
       .then((response) => {
         this.bigCategory = response.data
       })

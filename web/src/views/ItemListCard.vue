@@ -97,7 +97,7 @@
         hidden
         :dense="true"
         :headers="headers"
-        :items="itemsList"
+        :items="transactionsList"
         :items-per-page="15"
         :footer-props="{
           'items-per-page-options': [15, 30],
@@ -168,50 +168,73 @@
         </template>
       </v-data-table>
     </v-card>
-    <v-card v-for="item in itemsList" :key="item.id" class="pa-1 mb-2">
-      <div>
-        <span small v-bind:class="['no-wrap', 'px-1', 'font-weight-bold']" style="display: inline-block;width: 130px;">{{ item.date | moment("YYYY-MM-DD") }}</span>
-        <span :style="{display: 'inline-block', width: '140px'}">
-        <v-chip label small
-          v-bind:class="[ 'font-weight-bold', 'no-wrap', 'px-1', ]"
-          v-bind:style="{ background: item.categoryBigColor}"
-        >
-          {{ item.categoryBigName }}
-        </v-chip>
-        <span class='caption font-weight-bold no-wrap px-1'>{{ item.categorySubName }}</span>
-        </span>
-        <span :style="{display: 'inline-block', width: '90px'}">
-        <v-chip v-if="item.kind == 'expenses' || item.kind == 'transfer'" label small
+    <v-card v-for="transaction in transactionsList" :key="transaction.pk" class="pa-1 mb-2">
+      <span small v-bind:class="['no-wrap', 'px-1', 'font-weight-bold']" style="display: inline-block;width: 130px;">{{ transaction.date | moment("YYYY-MM-DD") }}</span>
+      <span :style="{display: 'inline-block', width: '90px'}">
+        <v-chip v-if="transaction.kind == 'expenses' || transaction.kind == 'transfer'" label small
           v-bind:class="[ 'font-weight-bold', 'no-wrap', 'px-1',]"
-          v-bind:style="{ background: item.walletExpensesColor}"
+          v-bind:style="{ background: transaction.wallet_expenses.color }"
         >
-          {{ item.walletExpensesName }}
+          {{ transaction.wallet_expenses.name }}
         </v-chip>
-        </span>
-        <v-icon v-if="item.kind == 'expenses'" color="red darken-1">mdi-chevron-double-right</v-icon>
-        <v-icon v-else-if="item.kind == 'income'" color="blue">mdi-chevron-double-right</v-icon>
-        <v-icon v-else-if="item.kind == 'transfer'" color="green">mdi-chevron-double-right</v-icon>
-        <span :style="{display: 'inline-block', width: '90px'}">
-          <v-chip v-if="item.kind == 'income' || item.kind == 'transfer'" label small
+      </span>
+        <v-icon v-if="transaction.kind == 'expenses'" color="red darken-1">mdi-chevron-double-right</v-icon>
+        <v-icon v-else-if="transaction.kind == 'income'" color="blue">mdi-chevron-double-right</v-icon>
+        <v-icon v-else-if="transaction.kind == 'transfer'" color="green">mdi-chevron-double-right</v-icon>
+      <span :style="{display: 'inline-block', width: '90px'}">
+          <v-chip v-if="transaction.kind == 'income' || transaction.kind == 'transfer'" label small
             v-bind:class="[ 'font-weight-bold', 'no-wrap', 'px-1',]"
-            v-bind:style="{ background: item.walletIncomeColor }"
+            v-bind:style="{ background: transaction.wallet_income.name }"
           >
-            {{ item.walletIncomeName }}
+            {{ transaction.wallet_income.name }}
           </v-chip>
-        </span>
-        <span class="no-wrap text-right mr-2 font-weight-bold" :style="{display: 'inline-block', width: '80px'}">¥ {{ item.amount | yen() }}</span>
-        <v-icon small class="mr-2" @click="openEditDialog(item)">
+      </span>
+      <span
+          v-if="transaction.kind == 'expenses'"
+          class="no-wrap text-right mr-2 font-weight-bold"
+          :style="{display: 'inline-block', width: '80px'}">
+          ¥ {{ itemsExpensesSum(transaction.items) | yen() }}
+      </span>
+      <span
+          v-else
+          class="no-wrap text-right mr-2 font-weight-bold"
+          :style="{display: 'inline-block', width: '80px'}">
+          ¥ {{ itemsIncomeSum(transaction.items) | yen() }}
+      </span>
+      <span class="caption" :style="{display: 'inline-block', }">{{ transaction.supplier.name}}</span>
+              <v-icon small class="mr-2" @click="openEditDialog(transaction)">
           mdi-pencil
         </v-icon>
-        <v-icon small class="mr-2" @click="openCopyDialog(item)">
+        <v-icon small class="mr-2" @click="openCopyDialog(transaction)">
           mdi-content-copy
         </v-icon>
-        <v-icon small @click="openDeleteDialog(item)">
+        <v-icon small @click="openDeleteDialog(transaction)">
           mdi-delete
         </v-icon>
-        <span class="caption" :style="{display: 'inline-block', }">{{ item.shop }}</span>
+      <div v-for="item in transaction.items" :key="item.pk">
+        <span :style="{display: 'inline-block', width: '140px'}">
+          <v-chip label small
+            v-bind:class="[ 'font-weight-bold', 'no-wrap', 'px-1', ]"
+            v-bind:style="{ background: item.sub_category.category.color }"
+          >
+            {{ item.sub_category.category.name }}
+          </v-chip>
+          <span class='caption font-weight-bold no-wrap px-1'>{{ item.sub_category.name }}</span>
+        </span>
+        <span
+          v-if="transaction.kind == 'expenses'"
+          class="no-wrap text-right mr-2 font-weight-bold"
+          :style="{display: 'inline-block', width: '80px'}">
+          ¥ {{ item.amount_expenses | yen() }}
+        </span>
+        <span
+          v-else
+          class="no-wrap text-right mr-2 font-weight-bold"
+          :style="{display: 'inline-block', width: '80px'}">
+          ¥ {{ item.amount_income | yen() }}
+        </span>
+        <span class="caption" :style="{display: 'inline-block', width: '300px'}">{{ item.name }}</span>
       </div>
-      <span class="caption">{{ item.name }}</span>
     </v-card>
     <v-card>
       <v-pagination
@@ -252,7 +275,7 @@ export default {
       // リスト
       bigCategory: [],
       subCategory: [],
-      itemsList: [],
+      transactionsList: [],
       walletList: [],
       kindList: [
         { key: 'expenses', name: '支出' },
@@ -299,16 +322,30 @@ export default {
       return moment(value).format(format)
     },
     yen (value) {
-      return value.toLocaleString()
+      return value
     }
   },
   methods: {
+    itemsIncomeSum (items) {
+      let sum = 0
+      for (const i in items) {
+        sum += items[i].amount_income
+      }
+      return sum
+    },
+    itemsExpensesSum (items) {
+      let sum = 0
+      for (const i in items) {
+        sum += items[i].amount_expenses
+      }
+      return sum
+    },
     clearFilter () {
       this.itemQuery = { startDate: '2000-01-01', endDate: '2100-01-01' }
     },
     // ダイアログ系
     openNewDialog () {
-      this.$refs.newDialog.openDialog(this.itemsList)
+      this.$refs.newDialog.openDialog(this.transactionsList)
     },
     openDeleteDialog (item) {
       this.$refs.deleteDialog.openDialog(item)
@@ -322,7 +359,7 @@ export default {
     // カテゴリに連動してサブカテゴリ更新
     getSubCategory (bigId) {
       axios
-        .get('/api/category/sub', {
+        .get('/api/rest/subcategorys', {
           params: {
             bigId: bigId
           }
@@ -342,10 +379,10 @@ export default {
       this.itemQuery.limit = 10
       this.loadingApi = true
       axios
-        .get('/api/item', { params: this.itemQuery })
+        .get('/api/rest/transactions', { params: this.itemQuery })
         .then((response) => {
-          this.totalItems = response.data.length
-          this.itemsList = response.data.items
+          this.totalItems = response.data.count
+          this.transactionsList = response.data.results
           this.loadingApi = false
         })
     }
@@ -356,7 +393,7 @@ export default {
     // routeのGETクエリは読み取り専用なので最初に取得して以後は使わない
     this.itemQuery = this.$route.query
     axios
-      .get('/api/wallet')
+      .get('/api/rest/wallets')
       .then((response) => {
         this.walletList = response.data
       })
@@ -364,7 +401,7 @@ export default {
         this.$_pushNotice('サーバーエラーが発生しました', 'error')
       })
     axios
-      .get('/api/category/big')
+      .get('/api/rest/categorys')
       .then((response) => {
         this.bigCategory = response.data
       })

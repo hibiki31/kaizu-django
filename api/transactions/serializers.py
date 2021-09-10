@@ -63,6 +63,7 @@ class TransactionSerializer(serializers.ModelSerializer):
         model = Transaction
         fields = (
             'pk',
+            'kind',
             'supplier',
             'supplier_id',
             'date',

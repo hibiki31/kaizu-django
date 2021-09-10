@@ -11,6 +11,7 @@ class Supplier(models.Model):
 
 class Transaction(models.Model):
     date = models.DateTimeField()
+    kind = models.CharField(max_length=8, default='expenses')
     supplier = models.ForeignKey(
         Supplier,
         related_name='transactions',
