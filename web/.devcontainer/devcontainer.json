@@ -1,0 +1,19 @@
+{
+	"name": "Vue UI",
+	"context": "..",
+	"dockerFile": "../Dockerfile.dev",
+	"settings": { 
+		"terminal.integrated.shell.linux": null
+	},
+	"forwardPorts": [
+		8080, // App
+		8000, // Vue UI
+	  ],
+	"extensions":["octref.vetur"],
+	"mounts": [
+		"source=try-hinav_node_modules,target=${containerWorkspaceFolder}/node_modules,type=volume"
+	],
+	"containerEnv": {
+		"CHOKIDAR_USEPOLLING": "true" // ホットリロード用
+	},
+}
