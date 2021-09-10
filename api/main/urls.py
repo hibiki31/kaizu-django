@@ -19,17 +19,24 @@ from django.conf.urls import url
 from rest_framework import routers
 
 from wallets.views import WalletViewSet
-from transactions.views import TransactionViewSet
+from transactions.views import TransactionViewSet, SupplierViewSet, CategorySummaryView
+from items.views import ItemViewSet, CategoryViewSet, SubCategoryViewSet
 
 
 router = routers.DefaultRouter()
 router.register(r'wallets', WalletViewSet)
 router.register(r'transactions', TransactionViewSet)
+router.register(r'suppliers', SupplierViewSet)
+router.register(r'items', ItemViewSet)
+router.register(r'categorys', CategoryViewSet)
+router.register(r'subcategorys', SubCategoryViewSet)
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('wallets/', include('wallets.urls')),
     path('auth/', include('rest_framework.urls')),
+    path('api/category/summary', CategorySummaryView.as_view()),
     url('api/rest/', include(router.urls)),
+
 ]

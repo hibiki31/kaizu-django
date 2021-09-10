@@ -10,7 +10,7 @@ class WalletSerializer(serializers.ModelSerializer):
         model = Wallet
         fields = (
             'pk',
-            'name', 
+            'name',
             'color',
             'amount',
             'amount_sum',
@@ -19,14 +19,20 @@ class WalletSerializer(serializers.ModelSerializer):
             'is_favorite',
             'is_hide',
         )
-    
+
     def get_amount_sum(self, obj):
         income = 0
         expenses = 0
-        for i in self.context['income']:
+
+        # POSTした内容を返すときはcontextがNoneになるらしい
+        if not set(self.context) >= {'income', 'expenses'}:
+            return 0
+ 
+        for i in self.context.get('income'):
             if i['transaction__wallet_income'] == obj.pk:
                 income = i['amount']
-        for i in self.context['expenses']:
+        for i in self.context.get('expenses'):
             if i['transaction__wallet_expenses'] == obj.pk:
                 expenses = i['amount']
+
         return income - expenses
