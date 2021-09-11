@@ -1,7 +1,9 @@
+import functools
 from django_filters import rest_framework as filters
 from django.core import serializers
 from django.db import connection, transaction, models
-from django.db.models import Q
+from django.db.models import Count, DateTimeField
+from django.db.models import Q, functions 
 from rest_framework.views import APIView
 from rest_framework import viewsets
 from rest_framework.response import Response
@@ -50,19 +52,22 @@ class CategorySummaryView(APIView):
     def get(self, request, format=None):
         
         transaction = Item.objects.filter(
-                transaction__date__year='2020', 
-                transaction__date__month='01'
-            ).values(
-            category_name=models.F('sub_category__category__name'), 
-            category_id=models.F('sub_category__category__pk')
+                transaction__date__year='2021',
+            ).annotate(month=functions.Trunc('transaction__date', 'month', output_field=DateTimeField())).values(
+                'month',
             ).annotate(
                 amount=models.Sum('amount_expenses')
+            ).values(
+                'month',
+                'amount',
+                'sub_category__category__name', 
+                'sub_category__category__pk'
             ).all()
-        
+
         sum_dict = {}
 
         for i in transaction:
-            sum_dict[i['category_id']] = i["amount"]
+            sum_dict[i['sub_category__category__pk']] = i["amount"]
         
         print(sum_dict)
         
