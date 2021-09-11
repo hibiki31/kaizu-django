@@ -25,7 +25,7 @@ from items.views import ItemViewSet, CategoryViewSet, SubCategoryViewSet
 
 router = routers.DefaultRouter()
 router.register(r'wallets', WalletViewSet)
-router.register(r'transactions', TransactionViewSet)
+router.register(r'transactions', TransactionViewSet, 'transaction')
 router.register(r'suppliers', SupplierViewSet)
 router.register(r'items', ItemViewSet)
 router.register(r'categorys', CategoryViewSet)

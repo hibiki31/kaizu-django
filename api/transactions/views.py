@@ -1,6 +1,7 @@
 from django_filters import rest_framework as filters
 from django.core import serializers
 from django.db import connection, transaction, models
+from django.db.models import Q
 from rest_framework.views import APIView
 from rest_framework import viewsets
 from rest_framework.response import Response
@@ -19,8 +20,23 @@ class SupplierFilter(filters.FilterSet):
 
 
 class TransactionViewSet(viewsets.ModelViewSet):
-    queryset = Transaction.objects.order_by('date').reverse().all()
     serializer_class = TransactionSerializer
+
+    def get_queryset(self):
+        queryset = Transaction.objects.order_by('date').reverse().all()
+        if (name := self.request.query_params.get('name')) is not None:
+            queryset = queryset.filter(items__name__icontains=name)
+        if (supplier := self.request.query_params.get('supplier')) is not None:
+            queryset = queryset.filter(supplier__name__icontains=supplier)
+        if (category := self.request.query_params.get('category')) is not None:
+            queryset = queryset.filter(items__sub_category__category__pk=category)
+        if (subcategory := self.request.query_params.get('subcategory')) is not None:
+            queryset = queryset.filter(items__sub_category__pk=subcategory)
+        if (wallet := self.request.query_params.get('wallet')) is not None:
+            queryset = queryset.filter(Q(wallet_income=wallet) | Q(wallet_expenses=wallet))
+        if (kind := self.request.query_params.get('kind')) is not None:
+            queryset = queryset.filter(kind=kind)
+        return queryset
 
 
 class SupplierViewSet(viewsets.ModelViewSet):

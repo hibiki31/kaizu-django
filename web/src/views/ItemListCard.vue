@@ -27,11 +27,11 @@
         <!-- 口座フィルター -->
         <v-select
           :items="walletList"
-          v-model="itemQuery.walletId"
+          v-model="itemQuery.wallet"
           class="pl-3"
           label="口座"
           item-text="name"
-          item-value="id"
+          item-value="pk"
           item-color="color"
           placeholder=" "
         >
@@ -43,11 +43,11 @@
         <v-select
           :items="bigCategory"
           item-text="code"
-          item-value="id"
+          item-value="pk"
           label="カテゴリ"
           placeholder=" "
           class="pl-3"
-          v-model="itemQuery.categoryBigId"
+          v-model="itemQuery.category"
           v-on:change="getSubCategory"
         >
           <template v-slot:item="{ item }">
@@ -62,10 +62,10 @@
         :items="subCategory"
         item-text="name"
         class="pl-3"
-        item-value="id"
+        item-value="pk"
         placeholder=" "
         label="サブカテゴリ"
-        v-model="itemQuery.categorySubId"
+        v-model="itemQuery.subcategory"
         >
         </v-select>
         <!-- 項目名フィルター -->
@@ -73,14 +73,14 @@
           class="pl-3"
           label="項目名"
           placeholder=" "
-          v-model="itemQuery.nameSearch"
+          v-model="itemQuery.name"
         ></v-text-field>
 
         <v-text-field
           class="pl-3"
           label="取引先"
           placeholder=" "
-          v-model="itemQuery.shopSearch"
+          v-model="itemQuery.supplier"
         ></v-text-field>
         <v-btn icon @click="clearFilter">
           <v-icon>mdi-eraser</v-icon>
