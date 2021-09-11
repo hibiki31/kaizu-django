@@ -204,6 +204,7 @@ def main():
             amount_expenses = 0
         data = {
             'date':str(i['date']),
+            'kind':i['kind'],
             'items':[{
                 'name': i['name'],
                 'sub_category_id': sub_category_old_to_new[i['sub_id']],

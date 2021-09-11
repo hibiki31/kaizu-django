@@ -109,7 +109,7 @@ export default {
     getSummary (startDate, endDate) {
       Object.assign(this.$data.data, this.$options.data().data)
       axios
-        .get('/api/summary/category/expenses', { params: { startDate: startDate, endDate: endDate } })
+        .get('/api/category/summary', { params: { year: '2021', month: '01' } })
         .then((response) => {
           for (const i in response.data) {
             this.data.datasets[0].data.unshift(response.data[i].sum)

@@ -50,8 +50,8 @@ class CategorySummaryView(APIView):
     def get(self, request, format=None):
         
         transaction = Item.objects.filter(
-                transaction__date__year='2020', 
-                transaction__date__month='01'
+                transaction__date__year=request.query_params.get('year','2021'), 
+                transaction__date__month=request.query_params.get('month','01')
             ).values(
             category_name=models.F('sub_category__category__name'), 
             category_id=models.F('sub_category__category__pk')
@@ -63,8 +63,7 @@ class CategorySummaryView(APIView):
 
         for i in transaction:
             sum_dict[i['category_id']] = i["amount"]
-        
-        print(sum_dict)
+
         
         category = Category.objects.all()
 
