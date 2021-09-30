@@ -32,8 +32,12 @@
                 v-model="item.amount"
             ></v-text-field>
             <v-switch
-              v-model="item.isFavorite"
+              v-model="item.is_favorite"
               label="Favorite"
+            ></v-switch>
+            <v-switch
+              v-model="item.is_hide"
+              label="Hide"
             ></v-switch>
             </v-col>
             <v-col cols="12" sm="12" md="6">
@@ -63,14 +67,15 @@ export default {
     return {
       dialogState: false,
       item: {
-        id: '',
+        pk: '',
         name: '',
         color: '',
         code: '',
         amount: 0,
+        amount_sum: 0,
         kind: '',
-        isFavorite: false,
-        isHide: true
+        is_favorite: false,
+        is_hide: true
       }
     }
   },
@@ -82,7 +87,7 @@ export default {
     },
     runMethod () {
       axios
-        .put('/api/wallet', this.item)
+        .put(`/api/rest/wallets/${this.item.pk}/`, this.item)
         .then(res => {
           this.$_pushNotice('成功しました', 'success')
         })

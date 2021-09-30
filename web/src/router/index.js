@@ -1,20 +1,20 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import ItemList from '../views/ItemList.vue'
 import ItemListCard from '../views/ItemListCard.vue'
 import Transaction from '../views/Transaction.vue'
 import CategoryList from '../views/CategoryList.vue'
 import WalletList from '../views/WalletList.vue'
 import Summary from '../views/Summary.vue'
+import Import from '../views/Import.vue'
 
 Vue.use(VueRouter)
 
 const routes = [
   {
     path: '/',
-    name: 'ItemList',
+    name: 'Index',
     meta: { title: 'Kaizu' },
-    component: ItemList
+    component: ItemListCard
   },
   {
     path: '/item',
@@ -39,6 +39,12 @@ const routes = [
     name: 'WalletList',
     meta: { title: 'Kaizu - Wallet' },
     component: WalletList
+  },
+  {
+    path: '/import',
+    name: 'Import',
+    meta: { title: 'Kaizu - import' },
+    component: Import
   },
   {
     path: '/summary',

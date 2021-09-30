@@ -1,57 +1,98 @@
 <template>
-<div class="summary">
+  <div class="summary">
     <v-container>
-        <v-row>
-            <v-col cols="12" md="6">
-                <v-card class="ma-5 pa-3">
-                    <v-text-field
-                    spellcheck="false"
-                    label="日付"
-                    type="date"
-                    placeholder=" "
-                    v-model="selectDate"
-                    ></v-text-field>
-                    <v-btn icon
-                    v-on:click="this.clickButton"
+      <v-card class="ma-5 pa-3">
+        <v-text-field
+          spellcheck="false"
+          label="日付"
+          type="month"
+          placeholder=" "
+          v-model="selectDate"
+          @change="getSummary(selectDate)"
+        ></v-text-field>
+      </v-card>
+      <v-row>
+        <v-col cols="12" md="12">
+          <v-card class="ma-5">
+            <CategorySummaryBarGraph
+              ref="categorySummaryBarGraph"
+              :height="230"
+            />
+          </v-card>
+        </v-col>
+        <v-col cols="12" md="12">
+          <v-card class="ma-5">
+            <CategorySummaryGraph ref="categoryGraph" :height="230" />
+          </v-card>
+        </v-col>
+        <v-col cols="12" md="12">
+          <v-card class="ma-5 pa-3">
+            <v-data-table
+              dense
+              :items-per-page="30"
+              :headers="headers"
+              :items="this.summary"
+            >
+              <template v-slot:item="{ item }" justify="right">
+                <tr>
+                  <td>
+                    <v-chip
+                      label
+                      small
+                      :to="{
+                        path: '/item/',
+                        query: {
+                          category: item.pk,
+                          year: selectDate.split('-')[0],
+                          month: selectDate.split('-')[1],
+                        },
+                      }"
+                      v-bind:class="['font-weight-bold', 'no-wrap', 'px-1']"
+                      v-bind:style="{ background: item.color }"
                     >
-                    <v-icon>mdi-magnify</v-icon>
-                    </v-btn>
-                </v-card>
-                <v-card class="ma-5">
-                    <CategorySummary ref='categorySummary' />
-                </v-card>
-            </v-col>
-            <v-col cols="12" md="6">
-                <v-card class="ma-5 pa-3">
-                  <v-data-table
-                    dense
-                    :items-per-page="30"
-                    :headers="headers"
-                    :items="this.summary"
-                  >
-                  <template v-slot:[`item.categoryBigName`]="{ item }">
-                    <v-chip label small
-                      :to="{ path: '/', query: { categoryBigId: item.categoryBigId , startDate: startDate, endDate: endDate }}"
-                      v-bind:class="[ 'font-weight-bold', 'no-wrap', 'px-1', ]"
-                      v-bind:style="{ background: item.categoryBigColor }"
-                    >
-                      {{ item.categoryBigName }}
+                      {{ item.name }}
                     </v-chip>
-                  </template>
-                  <template v-slot:[`item.sum`]="{ item }">
-                    ¥ {{ item.sum | yen() }}
-                  </template>
-                  </v-data-table>
-                </v-card>
-            </v-col>
-        </v-row>
+                  </td>
+                  <td
+                    v-for="(sum, index) in item.summary"
+                    :key="index"
+                    class="no-wrap text-right"
+                  >
+                    ¥ {{ sum | yen }}
+                  </td>
+                </tr>
+              </template>
+            </v-data-table>
+          </v-card>
+        </v-col>
+
+        <v-col cols="12" md="6">
+          <v-card class="ma-5 pa-3">
+            <v-text-field
+              spellcheck="false"
+              label="日付"
+              type="month"
+              placeholder=" "
+              v-model="selectDate"
+            ></v-text-field>
+            <v-btn icon v-on:click="this.clickButton">
+              <v-icon>mdi-magnify</v-icon>
+            </v-btn>
+          </v-card>
+          <v-card class="ma-5">
+            <CategorySummaryChart ref="categorySummary" />
+          </v-card>
+        </v-col>
+      </v-row>
     </v-container>
-</div>
+  </div>
 </template>
 
 <script>
 import axios from '@/axios/index'
-import CategorySummary from '../components/chart/CategorySummaryChart'
+import CategorySummaryChart from '../components/chart/CategorySummaryChart'
+import CategorySummaryGraph from '../components/chart/CategorySummaryMonthGraph'
+import CategorySummaryBarGraph from '../components/chart/CategorySummaryBarGraph'
 
 export default {
   name: 'Home',
@@ -62,21 +103,35 @@ export default {
       endDate: '',
       summary: [],
       headers: [
-        { text: 'NAME', value: 'categoryBigName' },
-        { text: 'SUM', value: 'sum' }
+        { text: 'NAME', value: 'name' },
+        { text: '1月', value: 'month_1' },
+        { text: '2月', value: 'month_2' },
+        { text: '3月', value: 'month_3' },
+        { text: '4月', value: 'month_4' },
+        { text: '5月', value: 'month_5' },
+        { text: '6月', value: 'month_6' },
+        { text: '7月', value: 'month_7' },
+        { text: '8月', value: 'month_8' },
+        { text: '9月', value: 'month_9' },
+        { text: '10月', value: 'month_10' },
+        { text: '11月', value: 'month_11' },
+        { text: '12月', value: 'month_12' }
       ],
       data: {
-        datasets: [{
-          data: [],
-          backgroundColor: []
-        }],
-        labels: [
-        ]
+        datasets: [
+          {
+            data: [],
+            backgroundColor: []
+          }
+        ],
+        labels: []
       }
     }
   },
   components: {
-    CategorySummary
+    CategorySummaryChart,
+    CategorySummaryGraph,
+    CategorySummaryBarGraph
   },
   filters: {
     yen (value) {
@@ -88,44 +143,50 @@ export default {
       this.monthQuery(this.selectDate)
     },
     monthQuery (dateStr) {
-      var date = new Date()
-      if (dateStr) {
-        date = new Date(dateStr)
-      }
-      var firstDate = new Date(date.getFullYear(), date.getMonth(), 1)
-      var lastDate = new Date(date.getFullYear(), date.getMonth() + 1, 0)
-
-      var start = (firstDate.getFullYear() + '-' + (firstDate.getMonth() + 1) + '-' + firstDate.getDate())
-      var end = (lastDate.getFullYear() + '-' + (lastDate.getMonth() + 1) + '-' + lastDate.getDate())
-
-      this.startDate = start
-      this.endDate = end
-
-      this.getSummary(start, end)
+      this.getSummary(dateStr)
     },
     setSummary () {
       this.$refs.categorySummary.dataSet(this.data)
+      this.$refs.categoryGraph.dataSet(this.summary)
+      this.$refs.categorySummaryBarGraph.dataSet(
+        this.summary,
+        this.selectDate.split('-')[0]
+      )
     },
-    getSummary (startDate, endDate) {
-      Object.assign(this.$data.data, this.$options.data().data)
+    getSummary (dateStr) {
       axios
-        .get('/api/category/summary', { params: { year: '2021', month: '01' } })
+        .get('/api/category/summary', {
+          params: { year: dateStr.split('-')[0], month: dateStr.split('-')[1] }
+        })
         .then((response) => {
+          this.data.datasets[0].data = []
+          this.data.labels = []
+          this.data.datasets[0].backgroundColor = []
           for (const i in response.data) {
-            this.data.datasets[0].data.unshift(response.data[i].sum)
-            this.data.labels.unshift(response.data[i].categoryBigName)
-            this.data.datasets[0].backgroundColor.unshift(response.data[i].categoryBigColor)
+            if (
+              response.data[i].name !== '振替' &&
+              response.data[i].summary !== 0
+            ) {
+              this.data.datasets[0].data.unshift(response.data[i].summary)
+              this.data.labels.unshift(response.data[i].name)
+              this.data.datasets[0].backgroundColor.unshift(
+                response.data[i].color
+              )
+            }
           }
           this.summary = response.data
           this.setSummary()
         })
-        .catch(async () => {
-          this.$_pushNotice('サーバーエラーが発生しました', 'error')
-        })
     }
   },
   mounted: async function () {
-    this.monthQuery()
+    var toDay = new Date()
+    this.selectDate = `${toDay.getFullYear()}-${(
+      '0' +
+      (toDay.getMonth() + 1)
+    ).slice(-2)}`
+    console.log(this.selectDate)
+    this.getSummary(this.selectDate)
   }
 }
 </script>

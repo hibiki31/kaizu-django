@@ -2,12 +2,8 @@
 	"name": "Vue UI",
 	"context": "..",
 	"dockerFile": "../Dockerfile.dev",
-	"settings": { 
-		"terminal.integrated.shell.linux": null
-	},
 	"forwardPorts": [
 		8080, // App
-		8000, // Vue UI
 	  ],
 	"extensions":["octref.vetur"],
 	"mounts": [

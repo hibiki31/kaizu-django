@@ -193,13 +193,13 @@
           v-if="transaction.kind == 'expenses'"
           class="no-wrap text-right mr-2 font-weight-bold"
           :style="{display: 'inline-block', width: '80px'}">
-          ¥ {{ itemsExpensesSum(transaction.items) | yen() }}
+          ¥ {{ itemsExpensesSum(transaction.items) | yen }}
       </span>
       <span
           v-else
           class="no-wrap text-right mr-2 font-weight-bold"
           :style="{display: 'inline-block', width: '80px'}">
-          ¥ {{ itemsIncomeSum(transaction.items) | yen() }}
+          ¥ {{ itemsIncomeSum(transaction.items) | yen }}
       </span>
       <span class="caption" :style="{display: 'inline-block', }">{{ transaction.supplier.name}}</span>
               <v-icon small class="mr-2" @click="openEditDialog(transaction)">
@@ -233,7 +233,7 @@
           :style="{display: 'inline-block', width: '80px'}">
           ¥ {{ item.amount_income | yen() }}
         </span>
-        <span class="caption" :style="{display: 'inline-block', width: '300px'}">{{ item.name }}</span>
+        <span class="caption">{{ item.name }}</span>
       </div>
     </v-card>
     <v-card>
@@ -322,7 +322,9 @@ export default {
       return moment(value).format(format)
     },
     yen (value) {
-      return value
+      if (value) {
+        return value.toLocaleString()
+      }
     }
   },
   methods: {

@@ -258,42 +258,39 @@ export default {
       this.dialogState = true
       this.inputValueMapping(item)
     },
-    inputValueMapping (item) {
+    inputValueMapping (transaction) {
       // タブIDと種別をマッピング
-      if (item.kind === 'expenses') {
+      if (transaction.kind === 'expenses') {
         this.tabId = 0
-      } else if (item.kind === 'income') {
+      } else if (transaction.kind === 'income') {
         this.tabId = 1
-      } else if (item.kind === 'transfer') {
+      } else if (transaction.kind === 'transfer') {
         this.tabId = 2
       }
-      // 取引先とカテゴリの選択肢を予め用意
-      this.shopList = [item.shop]
-      this.bigCategorySelect = item.categoryBigId
-      this.getSubCategory(item.categoryBigId)
       // アイテムをマッピング
-      this.item = {
-        id: item.transactionId,
-        date: moment(item.date).format('YYYY-MM-DD'),
-        shop: { shop: item.shop },
-        walletExpensesId: item.walletExpensesId,
-        walletIncomeId: item.walletIncomeId,
-        provider: '',
-        providerId: 0,
-        items: [{
-          id: item.id,
-          name: item.name,
-          kind: item.kind,
-          amount: item.amount,
-          categorySubId: item.categorySubId,
-          transactionId: 0
-        }]
+      this.transaction = {
+        pk: transaction.pk,
+        date: moment(transaction.date).format('YYYY-MM-DD'),
+        supplier_id: transaction.supplier.name,
+        wallet_income_id: transaction.wallet_income.pk,
+        wallet_expenses_id: transaction.wallet_expenses.pk,
+        items: []
+      }
+      for (const i in transaction.items) {
+        this.transaction.items.push({
+          name: transaction.items[i].name,
+          amount: transaction.kind === 'income' ? transaction.items[i].amount_income : transaction.items[i].amount_expenses,
+          sub_category_id: transaction.items[i].sub_category.pk,
+          bigCategorySelect: transaction.items[i].sub_category.category.pk
+        })
       }
     },
     async postValueMapping () {
       this.dialogState = false
-      this.transaction.date = moment(this.transaction.date).format()
-      if (typeof (this.transaction.supplier_id) === 'string' || this.transaction.supplier_id instanceof String) {
+      this.transaction.date = moment.utc(this.transaction.date).format()
+      if (this.shopList.find(shop => shop.name === this.transaction.supplier_id)) {
+        this.transaction.supplier_id = this.shopList.find(shop => shop.name === this.transaction.supplier_id).pk
+      } else if (typeof (this.transaction.supplier_id) === 'string' || this.transaction.supplier_id instanceof String) {
         await axios
           .post('/api/rest/suppliers/', { name: this.transaction.supplier_id })
           .then((res) => {

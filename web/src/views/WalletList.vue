@@ -39,17 +39,17 @@
               <div>{{ item.kind }}</div>
             </td>
             <td>
-              <v-icon v-if="item.isFavorite" color="orange darken-2">mdi-star</v-icon>
+              <v-icon v-if="item.is_favorite" color="orange darken-2">mdi-star</v-icon>
               <v-icon v-else>mdi-star</v-icon>
             </td>
             <td class="no-wrap text-right">
               <div>¥ {{ item.amount | yen() }}</div>
             </td>
             <td class="no-wrap text-right">
-              <div>¥ {{ item.sum | yen() }}</div>
+              <div>¥ {{ item.amount_sum | yen() }}</div>
             </td>
             <td class="no-wrap text-right">
-              <v-chip v-if="item.sum != item.amount" label small color="orange" class="font-weight-bold" >¥ {{ item.sum - item.amount | yen() }}</v-chip>
+              <v-chip v-if="item.amount_sum != item.amount" label small color="orange" class="font-weight-bold" >¥ {{ item.amount_sum - item.amount | yen() }}</v-chip>
             </td>
             <td>
               <v-icon small class="mr-2" @click="openEditDialog(item)">
@@ -116,11 +116,11 @@ export default {
     },
     reload () {
       axios
-        .get('/api/wallet/sum')
+        .get('/api/rest/wallets/')
         .then((response) => {
           this.walletsOriginal = response.data
           this.walletsFavorite = response.data.filter((row) => {
-            return (row.isFavorite === true)
+            return (row.is_favorite === true)
           })
           const card = response.data.filter((row) => {
             return (row.kind === 'カード')
@@ -128,10 +128,8 @@ export default {
           const hikiotoshi = response.data.filter((row) => {
             return (row.kind === '引き落とし')
           })
-          console.log(card)
-          console.log(hikiotoshi)
-          this.sumCard = card.reduce((value, i) => value - i.sum, 0)
-          this.sumHiki = hikiotoshi.reduce((value, i) => value + i.sum, 0)
+          this.sumCard = card.reduce((value, i) => value - i.amount_sum, 0)
+          this.sumHiki = hikiotoshi.reduce((value, i) => value + i.amount_sum, 0)
         })
         .catch(async () => {
           this.$_pushNotice('サーバーエラーが発生しました', 'error')
