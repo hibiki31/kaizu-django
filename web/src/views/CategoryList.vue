@@ -1,9 +1,9 @@
 <template>
   <div class="home">
-    <CategorySubEditDialog ref="subEditDialog" />
-    <CategoryBigEditDialog ref="editDialog" />
-    <CategoryDeleteDialog ref="deleteDialog" />
-    <CategoryMergeDialog ref="mergeDialog" />
+    <CategorySubEditDialog ref="subEditDialog" @reload='this.reload'/>
+    <CategoryBigEditDialog ref="editDialog" @reload='this.reload'/>
+    <CategoryDeleteDialog ref="deleteDialog" @reload='this.reload'/>
+    <CategoryMergeDialog ref="mergeDialog" @reload='this.reload'/>
     <v-card>
       <v-data-table
         :dense="true"
@@ -20,9 +20,9 @@
       >
         <!-- 拡張部分 -->
         <template v-slot:expanded-item="{ item }">
-          <tr :set="sub = filteredCategory(item)">
-            <tr v-for="row in sub" :key="row.id">
-              <td class="no-wrap">{{ row.id }}</td>
+          <tr :set="sub = item.sub_category">
+            <tr v-for="row in sub" :key="row.pk">
+              <td class="no-wrap">{{ row.pk }}</td>
               <td>
                 <router-link :to="{ path: '/', query: { categorySubId: row.id }}">
                   {{ row.name }}
@@ -40,9 +40,9 @@
               </v-icon>
               </td>
               <td>
-              <v-icon small class="mr-2" @click="openMergeDialog(row)">
+              <!-- <v-icon small class="mr-2" @click="openMergeDialog(row)">
                 mdi-merge
-              </v-icon>
+              </v-icon> -->
               </td>
             </tr>
         </template>
@@ -136,25 +136,28 @@ export default {
     },
     openMergeDialog (item) {
       this.$refs.mergeDialog.openDialog(item, this.bigCategory)
+    },
+    reload () {
+      axios
+        .get('/api/rest/categorys/')
+        .then((response) => {
+          this.bigCategory = response.data
+        })
+        .catch(async () => {
+          this.$_pushNotice('サーバーエラーが発生しました', 'error')
+        })
+      axios
+        .get('/api/rest/subcategorys/')
+        .then((response) => {
+          this.subCategory = response.data
+        })
+        .catch(async () => {
+          this.$_pushNotice('サーバーエラーが発生しました', 'error')
+        })
     }
   },
   mounted: async function () {
-    axios
-      .get('/api/category/big')
-      .then((response) => {
-        this.bigCategory = response.data
-      })
-      .catch(async () => {
-        this.$_pushNotice('サーバーエラーが発生しました', 'error')
-      })
-    axios
-      .get('/api/category/sub')
-      .then((response) => {
-        this.subCategory = response.data
-      })
-      .catch(async () => {
-        this.$_pushNotice('サーバーエラーが発生しました', 'error')
-      })
+    this.reload()
   }
 }
 </script>

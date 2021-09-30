@@ -59,7 +59,7 @@
         </v-select>
         <!-- サブカテゴリフィルター -->
         <v-select
-        :items="subCategory"
+        :items="getSubCategory(itemQuery.category)"
         item-text="name"
         class="pl-3"
         item-value="pk"
@@ -201,17 +201,17 @@
           :style="{display: 'inline-block', width: '80px'}">
           ¥ {{ itemsIncomeSum(transaction.items) | yen }}
       </span>
+      <v-icon small class="mr-2" @click="openEditDialog(transaction)">
+        mdi-pencil
+      </v-icon>
+      <v-icon small class="mr-2" @click="openCopyDialog(transaction)">
+        mdi-content-copy
+      </v-icon>
+      <v-icon small @click="openDeleteDialog(transaction)">
+        mdi-delete
+      </v-icon>
       <span class="caption" :style="{display: 'inline-block', }">{{ transaction.supplier.name}}</span>
-              <v-icon small class="mr-2" @click="openEditDialog(transaction)">
-          mdi-pencil
-        </v-icon>
-        <v-icon small class="mr-2" @click="openCopyDialog(transaction)">
-          mdi-content-copy
-        </v-icon>
-        <v-icon small @click="openDeleteDialog(transaction)">
-          mdi-delete
-        </v-icon>
-      <div v-for="item in transaction.items" :key="item.pk">
+      <div v-for="item in transaction.items" :key="item.pk" class="pt-1">
         <span :style="{display: 'inline-block', width: '140px'}">
           <v-chip label small
             v-bind:class="[ 'font-weight-bold', 'no-wrap', 'px-1', ]"
@@ -328,6 +328,13 @@ export default {
     }
   },
   methods: {
+    getSubCategory (bigId) {
+      for (const i in this.bigCategory) {
+        if (this.bigCategory[i].pk === bigId) {
+          return this.bigCategory[i].sub_category
+        }
+      }
+    },
     itemsIncomeSum (items) {
       let sum = 0
       for (const i in items) {
@@ -357,20 +364,6 @@ export default {
     },
     openCopyDialog (item) {
       this.$refs.newDialog.openCopyDialog(item)
-    },
-    // カテゴリに連動してサブカテゴリ更新
-    getSubCategory (bigId) {
-      axios
-        .get('/api/rest/subcategorys', {
-          params: {
-            bigId: bigId
-          }
-        })
-        .then((response) => {
-          if (response.status === 200) {
-            this.subCategory = response.data
-          }
-        })
     },
     clickSearchButton () {
       this.itemQuery.offset = 0

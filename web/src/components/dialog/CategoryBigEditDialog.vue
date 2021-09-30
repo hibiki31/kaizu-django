@@ -55,7 +55,7 @@ export default {
     },
     runMethod () {
       axios
-        .put('/api/category/big', this.item)
+        .put(`/api/rest/categorys/${this.item.pk}/`, this.item)
         .then((res) => {
           if (res.status !== 200) {
             this.$_pushNotice('処理に失敗しました', 'error')

@@ -12,7 +12,7 @@
             振替
           </v-tab>
         </v-tabs>
-          <v-container>
+          <v-container class="caption">
             <!-- トランザクション行 -->
             <v-row>
               <v-col cols="12" sm="12" md="3">
@@ -104,7 +104,7 @@
                 >
                 </v-select>
               </v-col>
-              <v-col cols="12" sm="10" md="6">
+              <v-col cols="12" sm="10" md="5">
                 <v-text-field
 
                   label="品目"
@@ -122,6 +122,9 @@
                   :rules="[required]"
                 />
               </v-col>
+              <v-icon small @click="deleteItem(row)">
+                mdi-delete
+              </v-icon>
             </v-row>
             <v-row>
               <v-btn class="ml-3" @click="addItem">+</v-btn>
@@ -248,6 +251,9 @@ export default {
         sub_category_id: 0
       })
     },
+    deleteItem (row) {
+      this.transaction.items = this.transaction.items.filter(n => n !== row)
+    },
     openEditDialog (item) {
       this.mode = 'put'
       this.dialogState = true
@@ -278,6 +284,7 @@ export default {
       }
       for (const i in transaction.items) {
         this.transaction.items.push({
+          pk: transaction.items[i].pk,
           name: transaction.items[i].name,
           amount: transaction.kind === 'income' ? transaction.items[i].amount_income : transaction.items[i].amount_expenses,
           sub_category_id: transaction.items[i].sub_category.pk,
@@ -336,10 +343,11 @@ export default {
           this.$_pushNotice('サーバーエラーが発生しました', 'error')
         })
     },
-    runPutMethod () {
-      this.postValueMapping()
+    async runPutMethod () {
+      await this.postValueMapping()
+      console.log(this.transaction)
       axios
-        .put('/api/transaction/items', this.item)
+        .put(`/api/rest/transactions/${this.transaction.pk}/`, this.transaction)
         .then((res) => {
           this.$_pushNotice('成功しました', 'success')
           this.$emit('reload')
@@ -384,3 +392,12 @@ export default {
   }
 }
 </script>
+
+<style>
+  .v-select {
+    font-size: 1.0em;
+  }
+  .v-text-field input {
+    font-size: 0.8em;
+  }
+</style>

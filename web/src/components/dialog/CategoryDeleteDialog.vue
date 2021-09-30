@@ -8,7 +8,7 @@
         <v-card-title class="headline">
           カテゴリを削除
         </v-card-title>
-        <v-card-text>{{ item.name }}を削除します．アイテムが使用している場合は削除できません．</v-card-text>
+        <v-card-text>{{ item.name }}を削除します．関連するサブカテゴリ、トランザクション、アイテムすべてが消えます</v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn
@@ -50,9 +50,9 @@ export default {
   methods: {
     openDialog (item, mode) {
       if (mode === 'big') {
-        this.deleteUrl = '/api/category/big'
+        this.deleteUrl = `/api/rest/categorys/${item.pk}/`
       } else {
-        this.deleteUrl = '/api/category/sub'
+        this.deleteUrl = `/api/rest/subcategorys/${item.pk}/`
       }
       this.item = item
       this.dialogState = true

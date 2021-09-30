@@ -18,10 +18,10 @@
             <v-select
             :items="categoryBig"
             item-text="code"
-            item-value="id"
+            item-value="pk"
             label="カテゴリ"
             placeholder=" "
-            v-model="item.categoryBigId"
+            v-model="item.category"
           >
             <template v-slot:item="{ item }">
               <span v-bind:style="{ color: item.color }">{{ item.code }} - {{ item.name }}</span>
@@ -50,7 +50,7 @@ export default {
         id: '',
         name: '',
         code: '',
-        categoryBigId: ''
+        category: ''
       },
       categoryBig: {}
     }
@@ -65,13 +65,14 @@ export default {
     },
     runMethod () {
       axios
-        .put('/api/category/sub', this.item)
+        .put(`/api/rest/subcategorys/${this.item.pk}/`, this.item)
         .then((res) => {
           if (res.status !== 200) {
             this.$_pushNotice('処理に失敗しました', 'error')
             return
           }
           this.$_pushNotice('成功しました', 'success')
+          this.$emit('reload')
         })
         .catch(async () => {
           this.$_pushNotice('サーバーエラーが発生しました', 'error')

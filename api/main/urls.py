@@ -33,10 +33,10 @@ router.register(r'subcategorys', SubCategoryViewSet)
 
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('wallets/', include('wallets.urls')),
+    path('api/admin/', admin.site.urls),
+    path('api/wallets/', include('wallets.urls')),
     path('api/transaction/', include('transactions.urls')),
-    path('auth/', include('rest_framework.urls')),
+    path('api/auth/', include('rest_framework.urls')),
     path('api/category/summary', CategorySummaryView.as_view()),
     url('api/rest/', include(router.urls)),
 

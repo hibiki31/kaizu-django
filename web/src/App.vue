@@ -46,6 +46,7 @@
           <v-tab key="tab-2" to="/category">CATEGORY</v-tab>
           <v-tab key="tab-3" to="/wallet">WALLET</v-tab>
           <v-tab key="tab-4" to="/summary">SUMMARY</v-tab>
+          <v-tab key="tab-5" to="/import">IMPORT</v-tab>
           <!-- 表示内容 -->
           <v-tab-item id="/item">
             <router-view v-if="activeTab === '/item'" />
@@ -58,6 +59,9 @@
           </v-tab-item>
           <v-tab-item id="/summary">
             <router-view v-if="activeTab === '/summary'" />
+          </v-tab-item>
+          <v-tab-item id="/import">
+            <router-view v-if="activeTab === '/import'" />
           </v-tab-item>
         </v-tabs>
       </template>
