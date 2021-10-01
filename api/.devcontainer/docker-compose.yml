@@ -1,7 +1,7 @@
 version: '3'
 
 services:
-  app:
+  kaizu-app:
     build:
       context: ..
       dockerfile: Dockerfile
@@ -9,7 +9,7 @@ services:
       - ../..:/workspace:cached
     command: sleep infinity
     network_mode: service:db
-  db:
+  kaizu-db:
     image: postgres:latest
     restart: unless-stopped
     volumes:

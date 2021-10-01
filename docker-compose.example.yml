@@ -1,0 +1,36 @@
+version: "3"
+services:
+  kaizu-app:
+    build: ./api
+    image: kaizu-app
+    volumes:
+      - kaizu-static:/opt/static
+    environment:
+      TZ: "Asia/Tokyo"
+    restart: always
+
+  kaizu-db:
+    image: postgres:latest
+    volumes:
+      - kaizu-postgres-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: postgres
+      POSTGRES_PASSWORD: postgres
+
+  kaizu-web:
+    build: ./web
+    image: kaizu-web
+    ports:
+    # - 80:80
+      - 0.0.0.0:80:80
+    volumes:
+      - ./log/nginx:/var/log/nginx
+      - kaizu-static:/opt/static/api/static
+    environment:
+      TZ: "Asia/Tokyo"
+    restart: always
+
+volumes:
+  kaizu-postgres-data:
+  kaizu-static:

@@ -92,7 +92,7 @@ DATABASES = {
         'NAME': 'postgres',
         'USER': 'postgres',
         'PASSWORD': 'postgres',
-        'HOST': 'db',
+        'HOST': 'kaizu-db',
         'PORT': '',
     }
 }
@@ -134,7 +134,13 @@ USE_TZ = False
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
-STATIC_URL = '/static/'
+STATIC_URL = '/api/static/'
+STATIC_ROOT = "/opt/static/"
+# STATICFILES_DIRS = [
+#     '/usr/local/lib/python3.9/site-packages/django/contrib/admin/static',
+# ]
+
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
