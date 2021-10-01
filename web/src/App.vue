@@ -30,12 +30,8 @@
         target="_blank"
         text
       >
-        <span class="mr-2">v1.3.2</span>
+        <span class="mr-2">v2.0.0</span>
         <v-icon>mdi-package-variant-closed</v-icon>
-      </v-btn>
-
-      <v-btn icon v-on:click="click">
-        <v-icon>mdi-cloud-download-outline</v-icon>
       </v-btn>
 
       <!-- タブ定義 -->

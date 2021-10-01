@@ -28,7 +28,7 @@ docker-compose run kaizu-app python3 manage.py migrate
 Backup database
 
 ```
-docker-compose run kaizu-app python3 manage.py dumpdata > kaizu_`date --iso-8601=hours`.backup.json
+docker-compose run kaizu-app python3 manage.py dumpdata > kaizu_`date --iso-8601=seconds`.backup.json
 ```
 
 Develop command
