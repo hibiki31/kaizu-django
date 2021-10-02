@@ -1,7 +1,7 @@
 {
 	"name": "KAIZU-API",
 	"dockerComposeFile": "docker-compose.yml",
-	"service": "app",
+	"service": "kaizu-app",
 	"workspaceFolder": "/workspace/api/",
 	"postCreateCommand": "echo alias m=\\'python manage.py\\' >> /etc/bash.bashrc",
 	"extensions": [

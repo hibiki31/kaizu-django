@@ -1,7 +1,16 @@
 <template>
   <div class="itemList">
-    <v-card>
+    <v-card class="pa-2">
       <form>
+        <v-select
+          :items="typeList"
+          item-text="name"
+          item-value="id"
+          label="タイプ"
+          placeholder=" "
+          v-model="type"
+        >
+        </v-select>
         <v-select
           :items="walletList"
           v-model="wallet"
@@ -74,6 +83,11 @@ export default {
   components: {},
   data: function () {
     return {
+      type: null,
+      typeList: [
+        { name: '楽天カード', id: 'rakuten_card' },
+        { name: 'PASMO', id: 'pasmo' }
+      ],
       file: null,
       fileData: null,
       wallet: null,
@@ -111,13 +125,13 @@ export default {
 
       const formData = new FormData()
       formData.append('file', this.file)
-      formData.append('type', 'rakuten')
+      formData.append('type', this.type)
       formData.append('wallet', this.wallet)
       formData.append('subcategory', this.subcategory)
       formData.append('supplier', this.supplier)
 
       const res = await axios.post(
-        '/api/transaction/import/rakuten_card',
+        '/api/transaction/import',
         formData,
         {
           headers: {

@@ -102,34 +102,90 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 
 @csrf_exempt
-def rakuten_card_csv(request):
+def import_csv(request):
     if request.method == 'POST':
         data = io.TextIOWrapper(request.FILES['file'].file, encoding='utf-8')
         csv_content = list(csv.reader(data))
 
-        print(request.POST.get('type', None))
+        csv_type = request.POST.get('type')
 
-        if ['\ufeff"利用日"', '利用店名・商品名', '利用者', '支払方法', '利用金額', '支払手数料', '支払総額', '9月支払金額', '10月繰越残高', '新規サイン'] != csv_content[0]:
+        if csv_type == 'rakuten_card':
+            return import_rakuten_card(request,csv_content)
+        elif csv_type == 'pasmo':
+            return import_pasmo(request,csv_content)
+        else:
             return HttpResponse({"error"})
-        for i in csv_content:
-            print(i)
-            if i[0] == '\ufeff"利用日"' or i[0] == '':
-                continue
-            
-            transaction = Transaction(
-                date = datetime.strptime(i[0], "%Y/%m/%d"),
-                wallet_income = Wallet(pk=int(request.POST.get('wallet', None))),
-                wallet_expenses = Wallet(pk=int(request.POST.get('wallet', None))),
-                supplier = Supplier(pk=int(request.POST.get('supplier', None)))
-            )
-            transaction.save()
-            item = Item(
-                name = i[1],
-                amount_income = 0,
-                amount_expenses = int(i[7]),
-                transaction = transaction,
-                sub_category = SubCategory(pk=int(request.POST.get('subcategory', None)))
-            )
-            item.save()
     
+    return HttpResponse({"plz post"})
+
+    
+    
+
+
+def import_rakuten_card(request, csv_content):
+    if ['\ufeff"利用日"', '利用店名・商品名', '利用者', '支払方法', '利用金額', '支払手数料', '支払総額', '9月支払金額', '10月繰越残高', '新規サイン'] != csv_content[0]:
+        return HttpResponse({"error"})
+    for i in csv_content:
+        if i[0] == '\ufeff"利用日"' or i[0] == '':
+            continue
+        
+        transaction = Transaction(
+            date = datetime.strptime(i[0], "%Y/%m/%d"),
+            wallet_income = Wallet(pk=int(request.POST.get('wallet', None))),
+            wallet_expenses = Wallet(pk=int(request.POST.get('wallet', None))),
+            supplier = Supplier(pk=int(request.POST.get('supplier', None)))
+        )
+        transaction.save()
+        item = Item(
+            name = i[1],
+            amount_income = 0,
+            amount_expenses = int(i[7]),
+            transaction = transaction,
+            sub_category = SubCategory(pk=int(request.POST.get('subcategory', None)))
+        )
+        item.save()
     return HttpResponse({"success"})
+
+def import_pasmo(request, csv_content):
+    if ['\ufeff月/日', '種別', '利用場所', '種別', '利用場所', '残額', '差額'] != csv_content[0]:
+        return HttpResponse({"type error"})
+    for i in csv_content:
+        if i[0] == '\ufeff月/日' or i[0] == '':
+            continue
+        if i[1] == '繰':
+            continue
+
+        amount = -int(i[6].replace(",", ""))
+        if amount < 0:
+            kind = 'transfer'
+            name = f'{i[1]} {i[2]}'
+            amount_income = -amount
+        elif i[1] == '物販':
+            kind = 'expenses'
+            name = '物販'
+            amount_income = 0
+        else:
+            kind = 'expenses'
+            name = f'{i[1]} {rep(i[2])} {i[3]} {rep(i[4])}'
+            amount_income = 0
+
+        transaction = Transaction(
+            date = datetime.strptime(i[0], "%Y/%m/%d"),
+            wallet_income = Wallet(pk=int(request.POST.get('wallet', None))),
+            wallet_expenses = Wallet(pk=int(request.POST.get('wallet', None))),
+            supplier = Supplier(pk=int(request.POST.get('supplier', None))),
+            kind = kind
+        )
+        transaction.save()
+        item = Item(
+            name = name,
+            amount_income = amount_income,
+            amount_expenses = amount,
+            transaction = transaction,
+            sub_category = SubCategory(pk=int(request.POST.get('subcategory', None)))
+        )
+        item.save()
+    return HttpResponse({"success"})
+
+def rep(txt):
+    return txt.replace("\u3000", " ")

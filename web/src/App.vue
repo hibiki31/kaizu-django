@@ -30,7 +30,7 @@
         target="_blank"
         text
       >
-        <span class="mr-2">v2.0.0</span>
+        <span class="mr-2">v{{ version }}</span>
         <v-icon>mdi-package-variant-closed</v-icon>
       </v-btn>
 
@@ -78,7 +78,8 @@ export default {
   name: 'App',
   data: function () {
     return {
-      activeTab: ''
+      activeTab: '',
+      version: require('../package.json').version
     }
   },
   watch: {
