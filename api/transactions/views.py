@@ -45,7 +45,7 @@ class TransactionViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(date__year=year)
         if (month := self.request.query_params.get('month')) is not None:
             queryset = queryset.filter(date__month=month)
-        return queryset
+        return queryset.distinct()
 
 
 class SupplierViewSet(viewsets.ModelViewSet):
