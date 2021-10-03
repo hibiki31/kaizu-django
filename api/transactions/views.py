@@ -104,7 +104,7 @@ from django.http import HttpResponse
 @csrf_exempt
 def import_csv(request):
     if request.method == 'POST':
-        data = io.TextIOWrapper(request.FILES['file'].file, encoding='utf-8')
+        data = io.TextIOWrapper(request.FILES['file'].file, encoding='utf-8-sig')
         csv_content = list(csv.reader(data))
 
         csv_type = request.POST.get('type')
@@ -123,10 +123,11 @@ def import_csv(request):
 
 
 def import_rakuten_card(request, csv_content):
-    if ['\ufeff"利用日"'] != csv_content[0][0]:
+    print(csv_content[0][0])
+    if '利用日' != csv_content[0][0]:
         return HttpResponse({"error"})
     for i in csv_content:
-        if i[0] == '\ufeff"利用日"' or i[0] == '':
+        if i[0] == '利用日' or i[0] == '':
             continue
         
         transaction = Transaction(
@@ -147,10 +148,10 @@ def import_rakuten_card(request, csv_content):
     return HttpResponse({"success"})
 
 def import_pasmo(request, csv_content):
-    if ['\ufeff月/日', '種別', '利用場所', '種別', '利用場所', '残額', '差額'] != csv_content[0]:
+    if ['月/日', '種別', '利用場所', '種別', '利用場所', '残額', '差額'] != csv_content[0]:
         return HttpResponse({"type error"})
     for i in csv_content:
-        if i[0] == '\ufeff月/日' or i[0] == '':
+        if i[0] == '月/日' or i[0] == '':
             continue
         if i[1] == '繰':
             continue
