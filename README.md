@@ -28,7 +28,14 @@ docker-compose run kaizu-app python3 manage.py migrate
 Backup database
 
 ```
-docker-compose run kaizu-app python3 manage.py dumpdata > kaizu_`date --iso-8601=seconds`.backup.json
+docker-compose run kaizu-app python3 manage.py dumpdata --exclude auth.permission --exclude contenttypes  > kaizu_`date --iso-8601=seconds`.backup.json
+```
+
+Restore database
+
+```
+docker-compose run kaizu-app python3 manage.py flush
+docker-compose run kaizu-app python3 manage.py loaddata backup.json
 ```
 
 Develop command
