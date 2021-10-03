@@ -88,6 +88,7 @@ class TransactionSerializer(serializers.ModelSerializer):
         instance.wallet_income = validated_data['wallet_income']
         instance.wallet_expenses = validated_data['wallet_expenses']
         instance.kind = validated_data['kind']
+        instance.date = validated_data['date']
         
         instance.save()
         return instance
