@@ -10,11 +10,11 @@ class ItemViewSet(viewsets.ModelViewSet):
     serializer_class = ItemSerializer
 
 class CategoryViewSet(viewsets.ModelViewSet):
-    queryset = Category.objects.all()
+    queryset = Category.objects.order_by('pk').all()
     serializer_class = CategorySerializer
     pagination_class = None
 
 class SubCategoryViewSet(viewsets.ModelViewSet):
-    queryset = SubCategory.objects.all()
+    queryset = SubCategory.objects.order_by('pk').all()
     serializer_class = SubCategorySerializer
     pagination_class = None

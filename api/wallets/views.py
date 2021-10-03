@@ -13,7 +13,7 @@ from items.models import Item
 
 
 class WalletViewSet(viewsets.ModelViewSet):
-    queryset = Wallet.objects.all()
+    queryset = Wallet.objects.order_by('pk').all()
     serializer_class = WalletSerializer
     pagination_class = None
 

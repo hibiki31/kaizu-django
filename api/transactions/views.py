@@ -28,7 +28,7 @@ class TransactionViewSet(viewsets.ModelViewSet):
     serializer_class = TransactionSerializer
 
     def get_queryset(self):
-        queryset = Transaction.objects.order_by('date','pk').reverse().all()
+        queryset = Transaction.objects.order_by('date','-pk').reverse().all()
         if (name := self.request.query_params.get('name')) is not None:
             queryset = queryset.filter(items__name__icontains=name)
         if (supplier := self.request.query_params.get('supplier')) is not None:
