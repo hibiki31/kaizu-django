@@ -115,7 +115,7 @@ export default {
           label: chart.tooltip._data.labels[position],
           value: chart.tooltip._data.datasets[datasetIndex].data[position]
         }
-        this.$router.push({
+        const resolvedRoute = this.$router.resolve({
           name: 'ItemListCard',
           query: {
             category: this.summary[info.datasetIndex].pk,
@@ -123,6 +123,7 @@ export default {
             month: info.valueIndex + 1
           }
         })
+        window.open(resolvedRoute.href, '_blank')
       } else {
         console.log('Background clicked')
       }
