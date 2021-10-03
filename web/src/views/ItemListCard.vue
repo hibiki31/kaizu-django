@@ -184,7 +184,7 @@
       <span :style="{display: 'inline-block', width: '90px'}">
           <v-chip v-if="transaction.kind == 'income' || transaction.kind == 'transfer'" label small
             v-bind:class="[ 'font-weight-bold', 'no-wrap', 'px-1',]"
-            v-bind:style="{ background: transaction.wallet_income.name }"
+            v-bind:style="{ background: transaction.wallet_income.color }"
           >
             {{ transaction.wallet_income.name }}
           </v-chip>

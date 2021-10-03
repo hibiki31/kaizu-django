@@ -123,7 +123,7 @@ def import_csv(request):
 
 
 def import_rakuten_card(request, csv_content):
-    if ['\ufeff"利用日"', '利用店名・商品名', '利用者', '支払方法', '利用金額', '支払手数料', '支払総額', '9月支払金額', '10月繰越残高', '新規サイン'] != csv_content[0]:
+    if ['\ufeff"利用日"'] != csv_content[0][0]:
         return HttpResponse({"error"})
     for i in csv_content:
         if i[0] == '\ufeff"利用日"' or i[0] == '':
