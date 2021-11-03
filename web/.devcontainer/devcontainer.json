@@ -7,7 +7,7 @@
 	  ],
 	"extensions":["octref.vetur"],
 	"mounts": [
-		"source=try-hinav_node_modules,target=${containerWorkspaceFolder}/node_modules,type=volume"
+		"source=kaizu_node_modules,target=${containerWorkspaceFolder}/node_modules,type=volume"
 	],
 	"containerEnv": {
 		"CHOKIDAR_USEPOLLING": "true" // ホットリロード用
