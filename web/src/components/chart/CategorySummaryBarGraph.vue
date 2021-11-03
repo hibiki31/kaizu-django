@@ -75,6 +75,7 @@ export default {
           type: 'bar',
           label: data[i].name,
           data: data[i].summary,
+          categoryKey: data[i].pk,
           backgroundColor: data[i].color,
           borderColor: data[i].color,
           borderWidth: 3,
@@ -113,12 +114,14 @@ export default {
           datasetIndex: datasetIndex,
           valueIndex: position,
           label: chart.tooltip._data.labels[position],
-          value: chart.tooltip._data.datasets[datasetIndex].data[position]
+          value: chart.tooltip._data.datasets[datasetIndex].data[position],
+          pk: this.data.datasets[datasetIndex].categoryKey
         }
+        console.log(info)
         const resolvedRoute = this.$router.resolve({
           name: 'ItemListCard',
           query: {
-            category: this.summary[info.datasetIndex].pk,
+            category: info.pk,
             year: this.year,
             month: info.valueIndex + 1
           }
